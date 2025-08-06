@@ -13,7 +13,7 @@ import { CategoryModel } from './category.model'
 import { CreateCategoryDto } from './dto/category.dto'
 import { UpdateCategoryDto } from './dto/update.category.dto'
 
-@Controller('category')
+@Controller('categories')
 export class CategoryController {
 	constructor(private readonly categoryService: CategoryService) {}
 
