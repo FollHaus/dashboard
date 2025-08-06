@@ -1,4 +1,4 @@
-import { IsDateString, IsInt, IsNumber, IsPositive } from 'class-validator'
+import { IsDateString, IsInt, IsPositive } from 'class-validator'
 
 export class CreateSaleDto {
 	@IsInt()
@@ -9,10 +9,6 @@ export class CreateSaleDto {
 	@IsPositive()
 	quantitySold: number
 
-	@IsNumber({ maxDecimalPlaces: 2 })
-	@IsPositive()
-	totalPrice: number
-
-	@IsDateString()
-	saleDate: string // формат ISO
+        @IsDateString()
+        saleDate: string // формат ISO
 }
