@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport'
 import { ConfigService } from '@nestjs/config'
 import { UserModel } from '../user.model'
 import { InjectModel } from '@nestjs/sequelize'
-import { ExtractJwt, Strategy } from 'passport-jwt'
+import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt'
 
 /**
  * JWT-стратегия для аутентификации на основе токена.
@@ -11,18 +11,22 @@ import { ExtractJwt, Strategy } from 'passport-jwt'
  */
 @Injectable()
 export class JWTStrategy extends PassportStrategy(Strategy) {
-	constructor(
-		private readonly configService: ConfigService,
-		@InjectModel(UserModel)
-		private readonly userModel: typeof UserModel
-	) {
-		// @ts-ignore
-		super({
-			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Извлекает токен из заголовка Bearer
-			ignoreExpiration: false, // Учитывает истечение срока действия токена
-			secretOrKey: configService.get<string>('JWT_SECRET') // Ключ для проверки подписи токена
-		})
-	}
+        constructor(
+                private readonly configService: ConfigService,
+                @InjectModel(UserModel)
+                private readonly userModel: typeof UserModel
+        ) {
+                const secret = configService.get<string>('JWT_SECRET')
+                if (!secret) {
+                        throw new Error('JWT_SECRET is not defined')
+                }
+                const options: StrategyOptions = {
+                        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Извлекает токен из заголовка Bearer
+                        ignoreExpiration: false, // Учитывает истечение срока действия токена
+                        secretOrKey: secret // Ключ для проверки подписи токена
+                }
+                super(options)
+        }
 
 	/**
 	 * Метод валидации пользователя по данным из токена.
