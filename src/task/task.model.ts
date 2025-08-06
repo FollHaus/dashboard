@@ -10,7 +10,10 @@ export enum TaskStatus {
 	tableName: 'Task',
 	deletedAt: false,
 	version: false,
-	indexes: [{ fields: ['deadline'] }, { fields: ['status'] }]
+        indexes: [
+                { fields: ['deadline'] },
+                { fields: ['status'] }
+        ]
 })
 export class TaskModel extends Model {
 	@Column(DataType.TEXT)
@@ -22,9 +25,12 @@ export class TaskModel extends Model {
 	@Column(DataType.DATE)
 	deadline: Date // Дедлайн задачи
 
-	@Column({
-		type: DataType.ENUM(...Object.values(TaskStatus)),
-		defaultValue: TaskStatus.Pending
-	})
-	status: TaskStatus // Статус задачи
+        @Column({
+                type: DataType.ENUM(...Object.values(TaskStatus)),
+                defaultValue: TaskStatus.Pending
+        })
+        status: TaskStatus // Статус задачи
+
+        @Column(DataType.STRING)
+        executor?: string // Исполнитель задачи
 }
