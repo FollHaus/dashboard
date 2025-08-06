@@ -32,9 +32,12 @@ export class SaleService {
 				trx
 			)
 
-			// 2) Получаем цену продажи для расчёта totalPrice
-			const product = await this.productService.findOne(dto.productId)
-			const totalPrice = product.salePrice * dto.quantitySold
+                        // 2) Получаем цену продажи для расчёта totalPrice в контексте trx
+                        const product = await this.productService.findOne(
+                                dto.productId,
+                                trx
+                        )
+                        const totalPrice = product.salePrice * dto.quantitySold
 
 			// 3) Создаём запись о продаже
 			const sale = await this.saleRepo.create(
