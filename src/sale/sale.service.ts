@@ -69,14 +69,14 @@ export class SaleService {
 		return sale
 	}
 
-	/**
-	 * Этапы обновления продажи:
-	 * 1) Начать trx.
-	 * 2) Получить sale внутри trx.
-	 * 3) Вычислить diff и скорректировать remains с передачей trx.
-	 * 4) Пересчитать totalPrice и обновить запись.
-	 */
-	async update(id: number, dto: UpdateSaleDto): Promise<SaleModel> {
+        /**
+         * Этапы обновления продажи:
+         * 1) Начать trx.
+         * 2) Получить sale внутри trx.
+         * 3) При необходимости вернуть остаток старого товара и списать новый либо скорректировать разницу.
+         * 4) Пересчитать totalPrice по актуальной цене и обновить запись.
+         */
+        async update(id: number, dto: UpdateSaleDto): Promise<SaleModel> {
 		return this.sequelize.transaction(async (trx: Transaction) => {
 			// 1) Читаем запись внутри trx
 			const sale = await this.saleRepo.findByPk(id, {
@@ -87,33 +87,50 @@ export class SaleService {
 				throw new NotFoundException(`Sale #${id} не найдена`)
 			}
 
-			// 2) Корректируем оставшиеся запасы
-			const oldQty = sale.quantitySold
-			const newQty = dto.quantitySold ?? oldQty
-			const diff = newQty - oldQty
-			if (diff > 0) {
-				await this.productService.decreaseRemains(sale.productId, diff, trx)
-			} else if (diff < 0) {
-				await this.productService.increaseRemains(sale.productId, -diff, trx)
-			}
+                        // 2) Корректируем запасы и цену
+                        const oldQty = sale.quantitySold
+                        const oldProductId = sale.productId
+                        const newProductId = dto.productId ?? oldProductId
+                        const newQty = dto.quantitySold ?? oldQty
 
-			// 3) Пересчитываем totalPrice
-			const salePrice = sale.product.salePrice
-			const totalPrice = salePrice * newQty
+                        let product = sale.product
 
-			// 4) Обновляем запись в trx
-			await sale.update(
-				{
-					quantitySold: newQty,
-					saleDate: dto.saleDate ?? sale.saleDate,
-					totalPrice
-				},
-				{ transaction: trx }
-			)
+                        if (newProductId !== oldProductId) {
+                                // Если меняется товар: возвращаем остатки старого и списываем остаток нового
+                                await this.productService.increaseRemains(oldProductId, oldQty, trx)
+                                await this.productService.decreaseRemains(newProductId, newQty, trx)
+                                product = await this.productService.findOne(newProductId, trx)
+                        } else {
+                                // Если товар тот же, корректируем разницу в количестве
+                                const diff = newQty - oldQty
+                                if (diff > 0) {
+                                        await this.productService.decreaseRemains(newProductId, diff, trx)
+                                } else if (diff < 0) {
+                                        await this.productService.increaseRemains(newProductId, -diff, trx)
+                                }
+                        }
 
-			return sale
-		})
-	}
+                        const totalPrice = product.salePrice * newQty
+
+                        // 3) Обновляем запись в trx
+                        await sale.update(
+                                {
+                                        productId: newProductId,
+                                        quantitySold: newQty,
+                                        saleDate: dto.saleDate ?? sale.saleDate,
+                                        totalPrice
+                                },
+                                { transaction: trx }
+                        )
+
+                        if (newProductId !== oldProductId) {
+                                // Обновляем связанную модель, чтобы вернуть актуальные данные
+                                sale.product = product
+                        }
+
+                        return sale
+                })
+        }
 
 	/**
 	 * Этапы удаления продажи:
