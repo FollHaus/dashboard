@@ -10,6 +10,7 @@ import { ProductModule } from './product/product.module'
 import { SaleModule } from './sale/sale.module'
 import { TaskModule } from './task/task.module'
 import { CategoryModule } from './category/category.module'
+import { AnalyticsModule } from './analytics/analytics.module'
 
 @Module({
 	imports: [
@@ -26,7 +27,8 @@ import { CategoryModule } from './category/category.module'
 		ProductModule,
 		SaleModule,
 		TaskModule,
-		CategoryModule
+		CategoryModule,
+		AnalyticsModule
 	],
 	controllers: [AppController],
 	providers: [AppService]
