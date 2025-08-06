@@ -57,6 +57,10 @@ $ yarn run test:e2e
 $ yarn run test:cov
 ```
 
+## Sales
+
+The `SaleService` automatically recalculates stock levels and total price when updating a sale. If the product is changed, the service restores the inventory of the old product and deducts the quantity from the new one.
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.

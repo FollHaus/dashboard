@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
 import { CategoryModel } from './category.model'
-import { ProductModel } from 'src/product/product.model'
+import { ProductModel } from '../product/product.model'
 import { CreateCategoryDto } from './dto/category.dto'
 import { UpdateCategoryDto } from './dto/update.category.dto'
 
