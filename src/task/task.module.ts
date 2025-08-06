@@ -5,7 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize'
 import { TaskModel } from './task.model'
 
 @Module({
-	imports: [SequelizeModule.forFeature([TaskModel])],
+        imports: [SequelizeModule.forFeature([TaskModel])],
 	controllers: [TaskController],
 	providers: [TaskService]
 })
