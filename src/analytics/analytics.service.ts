@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
-import { Op, fn, col } from 'sequelize'
+import { col, fn, Op } from 'sequelize'
 import { SaleModel } from '../sale/sale.model'
 import { ProductModel } from '../product/product.model'
 import { CategoryModel } from '../category/category.model'
@@ -14,6 +14,14 @@ export class AnalyticsService {
 		private readonly productRepo: typeof ProductModel
 	) {}
 
+	/**
+	 * Получает общую выручку за определённый период.
+	 *
+	 * @param startDate - Дата начала периода (строка)
+	 * @param endDate - Дата окончания периода (строка)
+	 * @param categoryIds - Массив ID категорий для фильтрации
+	 * @returns Промис с числом — суммарной выручкой
+	 */
 	async getRevenue(
 		startDate?: string,
 		endDate?: string,
@@ -34,6 +42,7 @@ export class AnalyticsService {
 		}
 		const revenue = await this.saleRepo.sum('totalPrice', {
 			where,
+			// @ts-ignore
 			include:
 				categoryIds && categoryIds.length
 					? [{ model: ProductModel, attributes: [] }]
@@ -42,6 +51,14 @@ export class AnalyticsService {
 		return parseFloat(String(revenue)) || 0
 	}
 
+	/**
+	 * Получает данные о продажах по категориям за определённый период.
+	 *
+	 * @param startDate - Дата начала периода (строка)
+	 * @param endDate - Дата окончания периода (строка)
+	 * @param categoryIds - Массив ID категорий для фильтрации
+	 * @returns Промис с массивом объектов данных о продажах по категориям
+	 */
 	async getSalesByCategories(
 		startDate?: string,
 		endDate?: string,
@@ -86,6 +103,13 @@ export class AnalyticsService {
 		return rows
 	}
 
+	/**
+	 * Получает список товаров с низким уровнем запасов.
+	 *
+	 * @param threshold - Пороговое значение количества товара (по умолчанию 10)
+	 * @param categoryIds - Массив ID категорий для фильтрации
+	 * @returns Промис с массивом объектов ProductModel
+	 */
 	async getLowStockProducts(
 		threshold = 10,
 		categoryIds?: number[]

@@ -21,4 +21,5 @@ async function bootstrap() {
 	await app.listen(4000)
 	console.log('> BOOTSTRAP: после listen')
 }
+
 bootstrap()

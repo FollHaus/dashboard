@@ -1,29 +1,29 @@
 import {
-        IsDateString,
-        IsEnum,
-        IsNotEmpty,
-        IsOptional,
-        IsString
+	IsDateString,
+	IsEnum,
+	IsNotEmpty,
+	IsOptional,
+	IsString
 } from 'class-validator'
 import { TaskStatus } from '../task.model'
 
 export class CreateTaskDto {
-        @IsString()
-        @IsNotEmpty()
-        title: string
+	@IsString()
+	@IsNotEmpty()
+	title: string
 
-        @IsString()
-        @IsOptional()
-        description?: string
+	@IsString()
+	@IsOptional()
+	description?: string
 
-        @IsDateString()
-        deadline: string
+	@IsDateString()
+	deadline: string
 
-        @IsEnum(TaskStatus)
-        @IsOptional()
-        status?: TaskStatus
+	@IsEnum(TaskStatus)
+	@IsOptional()
+	status?: TaskStatus
 
-        @IsString()
-        @IsOptional()
-        executor?: string
+	@IsString()
+	@IsOptional()
+	executor?: string
 }

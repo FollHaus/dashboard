@@ -2,6 +2,7 @@ import { Controller, Get, Query } from '@nestjs/common'
 import { AnalyticsService } from './analytics.service'
 import { ProductModel } from '../product/product.model'
 
+// Функция для парсинга строковых категорий в массив чисел
 function parseCategories(value?: string): number[] | undefined {
 	if (!value) return undefined
 	return value
@@ -14,6 +15,14 @@ function parseCategories(value?: string): number[] | undefined {
 export class AnalyticsController {
 	constructor(private readonly analyticsService: AnalyticsService) {}
 
+	/**
+	 * Получает общую выручку за определённый период.
+	 *
+	 * @param startDate - Дата начала периода (строка)
+	 * @param endDate - Дата окончания периода (строка)
+	 * @param categories - Строка с ID категорий через запятую
+	 * @returns Промис с числом — суммарной выручкой
+	 */
 	@Get('revenue')
 	getRevenue(
 		@Query('startDate') startDate?: string,
@@ -24,6 +33,14 @@ export class AnalyticsController {
 		return this.analyticsService.getRevenue(startDate, endDate, ids)
 	}
 
+	/**
+	 * Получает данные о продажах по категориям за определённый период.
+	 *
+	 * @param startDate - Дата начала периода (строка)
+	 * @param endDate - Дата окончания периода (строка)
+	 * @param categories - Строка с ID категорий через запятую
+	 * @returns Промис с массивом данных о продажах
+	 */
 	@Get('category-sales')
 	getCategorySales(
 		@Query('startDate') startDate?: string,
@@ -34,6 +51,13 @@ export class AnalyticsController {
 		return this.analyticsService.getSalesByCategories(startDate, endDate, ids)
 	}
 
+	/**
+	 * Получает список товаров с низким уровнем запасов.
+	 *
+	 * @param threshold - Пороговое значение количества товара (по умолчанию 10)
+	 * @param categories - Строка с ID категорий через запятую
+	 * @returns Промис с массивом объектов ProductModel
+	 */
 	@Get('low-stock')
 	getLowStock(
 		@Query('threshold') threshold = '10',

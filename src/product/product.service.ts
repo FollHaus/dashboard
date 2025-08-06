@@ -19,10 +19,8 @@ export class ProductService {
 	constructor(
 		@InjectModel(ProductModel)
 		private productRepo: typeof ProductModel,
-
 		@InjectModel(CategoryModel)
 		private categoryRepo: typeof CategoryModel,
-
 		@InjectConnection()
 		private sequelize: Sequelize
 	) {}
