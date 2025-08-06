@@ -139,6 +139,10 @@ export class ProductService {
 		trx?: Transaction
 	): Promise<void> {
 		const operation = async (t: Transaction) => {
+			const product = await this.findOne(productId, t)
+			if (product.remains < qty) {
+				throw new BadRequestException('Недостаточно остатков')
+			}
 			await this.productRepo.decrement(
 				{ remains: qty },
 				{ where: { id: productId }, transaction: t }
