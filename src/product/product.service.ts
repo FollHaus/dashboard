@@ -162,21 +162,22 @@ export class ProductService {
 	 * @param qty - сколько добавить
 	 * @param trx - опциональная транзакция
 	 */
-	async increaseRemains(
-		productId: number,
-		qty: number,
-		trx?: Transaction
-	): Promise<void> {
-		const operation = async (t: Transaction) => {
-			await this.productRepo.increment(
-				{ remains: qty },
-				{ where: { id: productId }, transaction: t }
-			)
-		}
+        async increaseRemains(
+                productId: number,
+                qty: number,
+                trx?: Transaction
+        ): Promise<void> {
+                const operation = async (t: Transaction) => {
+                        await this.findOne(productId, t)
+                        await this.productRepo.increment(
+                                { remains: qty },
+                                { where: { id: productId }, transaction: t }
+                        )
+                }
 
-		if (trx) {
-			await operation(trx)
-		} else {
+                if (trx) {
+                        await operation(trx)
+                } else {
 			await this.sequelize.transaction(async (t) => operation(t))
 		}
 	}
